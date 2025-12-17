@@ -1,68 +1,38 @@
-<!-- Chosen Palette: Warm Neutrals & Academic Blue -->
+<!-- Chosen Palette: Warm Neutrals, Academic Blue, Indigo (Part D), Amber (Part E) -->
 
-<!-- Application Structure Plan: The application is designed as an "Interactive Assessment Companion" for the MAP4C1 Data Analysis unit. It transforms the static assessment document into a dynamic workspace. 1. Navigation: A sidebar/top-bar structure divides the content into the three specific assessment parts (A, B, C) plus a Reference section. 2. Part A (Reverse Engineer): Features a 'Constraint Calculator' where students input their ID digit to instantly see their unique assessment criteria, reducing calculation errors. 3. Part B (The Critique): Transforms the textual scenario into an interactive simulation. Users can toggle between "Linear" and "Quadratic" models on a live chart to visually grasp WHY the analyst was wrong (demonstrating r vs r^2). 4. Part C (Case Study): A "Unique Data Generator." Students enter their full ID, and the app mathematically generates their specific dataset for the Coffee scenario and visualizes it immediately, allowing them to verify their Desmos work. 5. Reference: Consolidates key definitions (Correlation, Interpolation) from the background material for easy access during the exam. -->
+<!-- Application Structure Plan: Expanded to 5 Sections + Teacher Mode. 1. Navigation: Added Part D and Part E links. 2. Part D (Missing Link): Plant Sapling Scenario. - Inputs: Last digit N. - Logic: Generates the 4th point (5, 17+N). - Visual: Scatter plot of the 4 points + Line of Best Fit (calculated via JS regression) to visualize interpolation/extrapolation. 3. Part E (Outlier): Study Group Scenario. - Inputs: Last digit N. - Logic: Generates outlier (10, N). - Visual: Scatter plot showing original perfect correlation points vs. the new outlier. Toggles to show how the line shifts. 4. Teacher Mode: - Updated to calculate specific Answer Keys for D (Interpolation/Extrapolation values) and E (New r-value) based on student ID. -->
 
-<!-- Visualization & Content Choices: 1. Part B Chart (Ball Throw): - Goal: Visualize why Linear regression fails for parabolic data. - Method: Chart.js Scatter plot with two toggleable trendlines (Linear vs Quadratic). - Justification: Static text describes the error; the interactive chart PROVES it visually. - Interaction: Buttons to switch models. 2. Part C Chart (Coffee Cooling): - Goal: Show the specific student's unique dataset. - Method: Chart.js Scatter plot (Time vs Temp). - Justification: Helps students verify that the data they typed into Desmos looks correct (Exponential decay). - Interaction: Updates dynamically based on Student ID input. 3. Data Tables: - Goal: clear presentation of the unique values. - Method: HTML Tables with dynamic cell content. - Interaction: Cells update instantly on input change. 4. Reference Section: - Goal: Quick definitions. - Method: Accordion/Cards. - Justification: Reduces cognitive load by keeping definitions handy. -->
+<!-- Visualization & Content Choices: 1. Part D Chart: - Goal: Visualise the gap (Interpolation) and the distant prediction (Extrapolation). - Method: Scatter plot with a line extending to x=50. - Justification: Helps students "see" why Day 50 is risky compared to Day 3. 2. Part E Chart: - Goal: Show the "Leverage" effect of an outlier. - Method: Scatter plot. - Interaction: Toggle "Show Outlier" to see the r-value and line crash. -->
 
 <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
 
 <!DOCTYPE html>
 
-<html lang="en"> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>MAP4C1 Data Analysis Assessment Portal</title> <script src="https://cdn.tailwindcss.com"></script> <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <style> @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+<html lang="en"> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>MAP4C1 Assessment & Grading Tool</title> <script src="https://cdn.tailwindcss.com"></script> <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <style> @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
-    body {
-        font-family: 'Inter', sans-serif;
-        background-color: #f5f5f4; /* Warm grey/stone-100 */
-        color: #1c1917; /* Stone-900 */
-    }
-
-    /* Chart Container Styling - Mandatory Requirements */
-    .chart-container {
-        position: relative;
-        width: 100%;
-        max-width: 650px; /* Max width constraint */
-        margin-left: auto;
-        margin-right: auto;
-        height: 350px; /* Base height */
-        max-height: 400px;
-    }
-
-    @media (min-width: 768px) {
-        .chart-container {
-            height: 400px;
-        }
-    }
-
-    .glass-panel {
-        background: rgba(255, 255, 255, 0.95);
-        border: 1px solid rgba(231, 229, 228, 1);
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-        border-radius: 0.75rem;
-    }
-
-    .nav-item.active {
-        background-color: #e7e5e4; /* Stone-200 */
-        border-left: 4px solid #0ea5e9; /* Sky-500 */
-        font-weight: 600;
-    }
+    body { font-family: 'Inter', sans-serif; background-color: #f5f5f4; color: #1c1917; }
     
-    input:focus {
-        outline: none;
-        ring: 2px;
-        border-color: #0ea5e9;
-    }
+    /* Chart Styling */
+    .chart-container { position: relative; width: 100%; max-width: 650px; margin: 0 auto; height: 350px; max-height: 400px; }
+    @media (min-width: 768px) { .chart-container { height: 400px; } }
+
+    .glass-panel { background: rgba(255, 255, 255, 0.95); border: 1px solid rgba(231, 229, 228, 1); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); border-radius: 0.75rem; }
+    .nav-item.active { background-color: #e7e5e4; border-left: 4px solid #0ea5e9; font-weight: 600; }
+    input:focus { outline: none; ring: 2px; border-color: #0ea5e9; }
+    
+    /* Transition helper */
+    .fade-in { animation: fadeIn 0.3s ease-in-out; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 </style>
 </head> <body class="flex flex-col md:flex-row min-h-screen">
 
 <!-- Mobile Header -->
 <div class="md:hidden bg-stone-900 text-white p-4 flex justify-between items-center shadow-md z-50 sticky top-0">
     <h1 class="text-lg font-bold">MAP4C1 Assessment</h1>
-    <button id="mobile-menu-btn" class="text-stone-300 hover:text-white focus:outline-none">
-        <span class="text-2xl">&#9776;</span>
-    </button>
+    <button id="mobile-menu-btn" class="text-stone-300 hover:text-white focus:outline-none"><span class="text-2xl">&#9776;</span></button>
 </div>
 
-<!-- Sidebar Navigation -->
+<!-- Sidebar -->
 <nav id="sidebar" class="hidden md:flex flex-col w-64 bg-white border-r border-stone-200 fixed h-full z-40 transition-transform transform md:translate-x-0 -translate-x-full">
     <div class="p-6 border-b border-stone-100">
         <h1 class="text-xl font-bold text-stone-800">MAP4C1 Stats</h1>
@@ -70,106 +40,57 @@
     </div>
     <div class="flex-1 overflow-y-auto py-4">
         <ul class="space-y-1">
-            <li>
-                <button onclick="navigateTo('intro')" class="nav-item w-full text-left px-6 py-3 text-stone-600 hover:bg-stone-50 transition-colors flex items-center gap-3">
-                    <span>🏠</span> Overview
-                </button>
-            </li>
-            <li>
-                <button onclick="navigateTo('part-a')" class="nav-item w-full text-left px-6 py-3 text-stone-600 hover:bg-stone-50 transition-colors flex items-center gap-3">
-                    <span>A</span> Reverse Engineer
-                </button>
-            </li>
-            <li>
-                <button onclick="navigateTo('part-b')" class="nav-item w-full text-left px-6 py-3 text-stone-600 hover:bg-stone-50 transition-colors flex items-center gap-3">
-                    <span>B</span> The "Bad Analyst"
-                </button>
-            </li>
-            <li>
-                <button onclick="navigateTo('part-c')" class="nav-item w-full text-left px-6 py-3 text-stone-600 hover:bg-stone-50 transition-colors flex items-center gap-3">
-                    <span>C</span> Unique Case Study
-                </button>
-            </li>
-            <li>
-                <button onclick="navigateTo('reference')" class="nav-item w-full text-left px-6 py-3 text-stone-600 hover:bg-stone-50 transition-colors flex items-center gap-3">
-                    <span>📚</span> Reference Guide
-                </button>
-            </li>
+            <li><button onclick="navigateTo('intro')" class="nav-item w-full text-left px-6 py-3 text-stone-600 hover:bg-stone-50 flex gap-3"><span>🏠</span> Overview</button></li>
+            <li><button onclick="navigateTo('part-a')" class="nav-item w-full text-left px-6 py-3 text-stone-600 hover:bg-stone-50 flex gap-3"><span>A</span> Reverse Engineer</button></li>
+            <li><button onclick="navigateTo('part-b')" class="nav-item w-full text-left px-6 py-3 text-stone-600 hover:bg-stone-50 flex gap-3"><span>B</span> Bad Analyst</button></li>
+            <li><button onclick="navigateTo('part-c')" class="nav-item w-full text-left px-6 py-3 text-stone-600 hover:bg-stone-50 flex gap-3"><span>C</span> Case Study</button></li>
+            <li><button onclick="navigateTo('part-d')" class="nav-item w-full text-left px-6 py-3 text-stone-600 hover:bg-stone-50 flex gap-3"><span>D</span> Missing Link</button></li>
+            <li><button onclick="navigateTo('part-e')" class="nav-item w-full text-left px-6 py-3 text-stone-600 hover:bg-stone-50 flex gap-3"><span>E</span> Outlier Impact</button></li>
+            <li><button onclick="navigateTo('reference')" class="nav-item w-full text-left px-6 py-3 text-stone-600 hover:bg-stone-50 flex gap-3"><span>📚</span> Reference Guide</button></li>
         </ul>
     </div>
     <div class="p-4 border-t border-stone-100 bg-stone-50">
-        <p class="text-xs text-stone-400">Desmos Required for Assessment</p>
+        <button onclick="navigateTo('teacher-mode')" class="text-xs text-stone-400 hover:text-sky-600 underline w-full text-center">Teacher Grading Mode</button>
     </div>
 </nav>
 
-<!-- Main Content Area -->
+<!-- Main Content -->
 <main class="flex-1 md:ml-64 p-4 md:p-8 max-w-7xl mx-auto w-full">
     
     <!-- SECTION: Intro -->
-    <section id="intro" class="space-y-6 animate-fade-in">
+    <section id="intro" class="space-y-6 fade-in">
         <div class="glass-panel p-8">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
                 <div>
-                    <h2 class="text-3xl font-bold text-stone-800 mb-2">Two-Variable Data Analysis Assessment</h2>
-                    <p class="text-stone-600">Linear & Non-Linear Regression • Interpolation • Extrapolation</p>
+                    <h2 class="text-3xl font-bold text-stone-800 mb-2">Two-Variable Data Analysis</h2>
+                    <p class="text-stone-600">Regressions • Interpolation • Extrapolation • Outliers</p>
                 </div>
                 <span class="mt-4 md:mt-0 bg-sky-100 text-sky-800 px-3 py-1 rounded-full text-sm font-medium">Desmos Required</span>
             </div>
-            
             <div class="prose max-w-none text-stone-600">
-                <p class="mb-4">
-                    Welcome to the interactive companion for your Unit 6 assessment. This assessment tests your ability to interpret correlation (<i>r</i> ), determine goodness of fit (<i>r<sup> 2</sup></i> ), and apply regression models to real-world scenarios.
-                </p>
+                <p class="mb-4">Welcome to the interactive companion for your Unit 6 assessment.</p>
                 <div class="bg-amber-50 border-l-4 border-amber-400 p-4 rounded-r mb-6">
-                    <div class="flex">
-                        <div class="flex-shrink-0">
-                            <span class="text-amber-500 text-xl">⚠</span>
-                        </div>
-                        <div class="ml-3">
-                            <h3 class="text-sm font-medium text-amber-800">Unique Data Requirement</h3>
-                            <p class="text-sm text-amber-700 mt-1">
-                                Portions of this assessment rely on your <strong>Student ID</strong>. This app will help you generate your unique dataset. Ensure you use the values generated here, or your answers will be marked incorrect.
-                            </p>
-                        </div>
-                    </div>
+                    <h3 class="text-sm font-medium text-amber-800">Unique Data Requirement</h3>
+                    <p class="text-sm text-amber-700 mt-1">Portions of this assessment rely on your <strong>Student ID</strong>. Use this app to generate your unique data, then screenshot your work in Desmos.</p>
                 </div>
-                
-                <h3 class="text-lg font-semibold text-stone-800 mb-2">Instructions:</h3>
-                <ul class="list-disc pl-5 space-y-2 mb-6">
-                    <li>Open <a href="https://www.desmos.com/calculator" target="_blank" class="text-sky-600 hover:underline">Desmos Graphing Calculator</a> in a separate tab. (Just click the link)</li>
-                    <li>Use the sections in the sidebar to view your specific questions and generate your unique data.</li>
-                    <li>Take screenshots of your Desmos work as evidence.</li>
-                </ul>
-                
-                <button onclick="navigateTo('part-a')" class="bg-stone-900 text-white px-6 py-3 rounded-lg hover:bg-stone-800 transition shadow-lg flex items-center gap-2">
-                    Start Assessment <span>→</span>
-                </button>
+                <button onclick="navigateTo('part-a')" class="bg-stone-900 text-white px-6 py-3 rounded-lg hover:bg-stone-800 transition shadow-lg flex items-center gap-2">Start Assessment <span>→</span></button>
             </div>
         </div>
     </section>
 
     <!-- SECTION: Part A -->
-    <section id="part-a" class="hidden space-y-6">
+    <section id="part-a" class="hidden space-y-6 fade-in">
         <div class="glass-panel p-6 md:p-8">
-            <div class="border-b border-stone-200 pb-4 mb-6">
-                <h2 class="text-2xl font-bold text-stone-800">Part A: The "Reverse Engineer" Challenge</h2>
-                <p class="text-stone-500 mt-1">Knowledge & Understanding (10 Marks)</p>
-            </div>
-
+            <div class="border-b border-stone-200 pb-4 mb-6"><h2 class="text-2xl font-bold text-stone-800">Part A: The "Reverse Engineer" Challenge</h2></div>
             <div class="grid md:grid-cols-2 gap-8">
-                <!-- Instructions Column -->
                 <div class="space-y-4">
-                    <p class="text-stone-600">
-                        <strong>Goal:</strong> Instead of calculating correlation for a list of numbers, you must <em>create</em> data that behaves in a specific way.
-                    </p>
-                    
+                    <p class="text-stone-600"><strong>Goal:</strong> Create a unique dataset in Desmos.</p>
                     <div class="bg-white p-6 rounded-lg border border-stone-200 shadow-sm">
-                        <h3 class="font-bold text-stone-800 mb-4 border-b pb-2">Your Constraint Calculator</h3>
+                        <h3 class="font-bold text-stone-800 mb-4 border-b pb-2">Constraint Calculator</h3>
                         <div class="mb-4">
-                            <label class="block text-sm font-medium text-stone-700 mb-1">Enter the Last Digit of your Student ID ($N$):</label>
-                            <input type="number" id="part-a-input" min="0" max="9" class="w-full p-3 border border-stone-300 rounded-md focus:ring-sky-500 focus:border-sky-500" placeholder="e.g., 5">
+                            <label class="block text-sm font-medium text-stone-700 mb-1">Enter Last Digit of ID ($N$):</label>
+                            <input type="number" id="part-a-input" min="0" max="9" class="w-full p-3 border border-stone-300 rounded-md focus:ring-sky-500" placeholder="e.g., 5">
                         </div>
-                        
                         <div id="part-a-result" class="hidden bg-sky-50 p-4 rounded-md border border-sky-100">
                             <p class="text-sm text-sky-900 font-medium">Your Unique Criteria:</p>
                             <ul class="list-disc pl-5 text-sm text-sky-800 mt-2 space-y-1">
@@ -179,25 +100,13 @@
                             </ul>
                         </div>
                     </div>
-
-                    <div class="text-sm text-stone-500 italic">
-                        Tip: In Desmos, add a table and start typing points. Adjust the y-values until the line of best fit crosses near your target intercept.
-                    </div>
                 </div>
-
-                <!-- Task details -->
                 <div class="bg-stone-50 p-6 rounded-lg border border-stone-200">
                     <h3 class="font-semibold text-stone-800 mb-3">Your Tasks</h3>
                     <ol class="list-decimal pl-5 space-y-3 text-stone-700">
-                        <li>
-                            <strong>Create the Table:</strong> In Desmos, make a table with at least 10 points satisfying the criteria on the left.
-                        </li>
-                        <li>
-                            <strong>Screenshot:</strong> Capture your table, scatter plot, and regression parameters ($r, m, b$).
-                        </li>
-                        <li>
-                            <strong>Explain:</strong> Why are your data points "moderate/strong" rather than "perfect"? Discuss the visual "scatter" (residuals) relative to the line.
-                        </li>
+                        <li><strong>Create Table:</strong> In Desmos, make a table (10+ points) matching the criteria.</li>
+                        <li><strong>Screenshot:</strong> Capture table, graph, and regression ($r, m, b$).</li>
+                        <li><strong>Explain:</strong> Discuss the visual "scatter" relative to the line.</li>
                     </ol>
                 </div>
             </div>
@@ -205,185 +114,217 @@
     </section>
 
     <!-- SECTION: Part B -->
-    <section id="part-b" class="hidden space-y-6">
+    <section id="part-b" class="hidden space-y-6 fade-in">
         <div class="glass-panel p-6 md:p-8">
-            <div class="border-b border-stone-200 pb-4 mb-6">
-                <h2 class="text-2xl font-bold text-stone-800">Part B: The "Bad Analyst" Critique</h2>
-                <p class="text-stone-500 mt-1">Thinking & Inquiry (10 Marks)</p>
-            </div>
-
+            <div class="border-b border-stone-200 pb-4 mb-6"><h2 class="text-2xl font-bold text-stone-800">Part B: The "Bad Analyst" Critique</h2></div>
             <div class="grid lg:grid-cols-2 gap-8 items-start">
-                <!-- Scenario & Tasks -->
                 <div class="space-y-6">
                     <div class="bg-rose-50 border-l-4 border-rose-400 p-4 rounded-r">
-                        <h3 class="font-bold text-rose-800 mb-1">The Analyst's Mistake</h3>
-                        <p class="text-rose-700 text-sm">
-                            A junior analyst ran a <strong>Linear Regression</strong> on the "Ball Thrown" data below and got $r = 0.05$. 
-                            They concluded: <em>"Since $r$ is close to 0, the data is random."</em>
-                        </p>
+                        <p class="text-rose-700 text-sm">Analyst says: <em>"Since $r=0.05$, the data is random."</em></p>
                     </div>
-
                     <div>
-                        <h3 class="font-semibold text-stone-800 mb-2">Interactive Analysis</h3>
-                        <p class="text-stone-600 text-sm mb-4">Use the buttons below to visualize different models on the data.</p>
-                        
-                        <div class="flex flex-wrap gap-2 mb-4">
-                            <button onclick="updateChartB('linear')" class="px-4 py-2 bg-stone-200 hover:bg-stone-300 text-stone-800 rounded transition text-sm font-medium">
-                                Show Linear Model
-                            </button>
-                            <button onclick="updateChartB('quadratic')" class="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white rounded transition text-sm font-medium shadow-sm">
-                                Show Quadratic Model
-                            </button>
+                        <div class="flex gap-2 mb-4">
+                            <button onclick="updateChartB('linear')" class="px-4 py-2 bg-stone-200 hover:bg-stone-300 rounded text-sm font-medium">Show Linear</button>
+                            <button onclick="updateChartB('quadratic')" class="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white rounded text-sm font-medium">Show Quadratic</button>
                         </div>
-                        
-                        <div id="model-stats" class="p-3 bg-stone-100 rounded text-sm font-mono text-stone-700 border border-stone-200">
-                            Select a model to see statistics.
-                        </div>
+                        <div id="model-stats" class="p-3 bg-stone-100 rounded text-sm font-mono text-stone-700 border border-stone-200">Select a model.</div>
                     </div>
-
                     <div class="bg-white p-5 rounded-lg border border-stone-200">
                         <h3 class="font-semibold text-stone-800 mb-2">Your Tasks</h3>
                         <ul class="list-disc pl-5 space-y-2 text-sm text-stone-600">
-                            <li><strong>Identify Error:</strong> Why is $r=0.05$ misleading here?</li>
-                            <li><strong>Correct Metric:</strong> Why should they use $r^2$ instead?</li>
-                            <li><strong>Correct Model:</strong> Which shape fits the physics of a thrown ball?</li>
+                            <li><strong>Identify Error:</strong> Why is $r=0.05$ misleading?</li>
+                            <li><strong>Correct Metric:</strong> Why use $r^2$?</li>
+                            <li><strong>Correct Model:</strong> Which shape fits the physics?</li>
                         </ul>
                     </div>
                 </div>
-
-                <!-- Visualization -->
                 <div class="bg-white p-4 rounded-xl border border-stone-200 shadow-sm">
-                    <h4 class="text-center font-medium text-stone-500 mb-2">Data: Height of a Ball over Time</h4>
-                    <div class="chart-container">
-                        <canvas id="chartB"></canvas>
-                    </div>
-                    <p class="text-xs text-center text-stone-400 mt-2">Data Points: (0.5, 9), (1.0, 15), (1.5, 19), (2.0, 20), (2.5, 19), (3.0, 16), (3.5, 10)</p>
+                    <div class="chart-container"><canvas id="chartB"></canvas></div>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- SECTION: Part C -->
-    <section id="part-c" class="hidden space-y-6">
+    <section id="part-c" class="hidden space-y-6 fade-in">
         <div class="glass-panel p-6 md:p-8">
-            <div class="border-b border-stone-200 pb-4 mb-6">
-                <h2 class="text-2xl font-bold text-stone-800">Part C: The Unique Case Study</h2>
-                <p class="text-stone-500 mt-1">Application (15 Marks)</p>
-            </div>
-
-            <div class="prose max-w-none text-stone-600 mb-6">
-                <p>
-                    You are analyzing the <strong>"Cooling Rate of a Cup of Coffee."</strong>
-                    Your data is unique to you. Enter your student ID below to generate your specific dataset.
-                </p>
-            </div>
-
-            <!-- Input Section -->
+            <div class="border-b border-stone-200 pb-4 mb-6"><h2 class="text-2xl font-bold text-stone-800">Part C: The Unique Case Study</h2></div>
             <div class="bg-white p-6 rounded-lg border border-stone-200 shadow-sm mb-8">
-                <label class="block text-sm font-bold text-stone-700 mb-2">Step 1: Enter Your Student ID</label>
+                <label class="block text-sm font-bold text-stone-700 mb-2">Enter Your Student ID:</label>
                 <div class="flex gap-4 items-center">
-                    <input type="text" id="student-id-input" class="flex-1 max-w-xs p-3 border border-stone-300 rounded-md focus:ring-sky-500 focus:border-sky-500 font-mono tracking-widest" placeholder="e.g. 123456789">
-                    <button onclick="generateUniqueData()" class="bg-emerald-600 text-white px-6 py-3 rounded-md hover:bg-emerald-700 transition font-medium">Generate Data</button>
+                    <input type="text" id="student-id-input" class="flex-1 max-w-xs p-3 border border-stone-300 rounded-md focus:ring-sky-500 font-mono tracking-widest" placeholder="e.g. 123456789">
+                    <button onclick="generateUniqueData()" class="bg-emerald-600 text-white px-6 py-3 rounded-md hover:bg-emerald-700 font-medium">Generate Data</button>
                 </div>
-                <p class="text-xs text-stone-400 mt-2">The system will use the last digit ($N$) to offset the starting temperature.</p>
             </div>
-
             <div id="part-c-content" class="hidden grid lg:grid-cols-2 gap-8">
-                <!-- Data Table -->
                 <div>
-                    <h3 class="font-bold text-stone-800 mb-4">Step 2: Copy Data to Desmos</h3>
+                    <h3 class="font-bold text-stone-800 mb-4">Your Data Table</h3>
                     <div class="overflow-hidden rounded-lg border border-stone-200">
                         <table class="min-w-full divide-y divide-stone-200">
-                            <thead class="bg-stone-50">
-                                <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-stone-500 uppercase tracking-wider">Time (min) $x$</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-stone-500 uppercase tracking-wider">Temp (°C) $y$</th>
-                                </tr>
-                            </thead>
-                            <tbody id="generated-table-body" class="bg-white divide-y divide-stone-200 font-mono text-sm text-stone-700">
-                                <!-- Rows generated by JS -->
-                            </tbody>
+                            <thead class="bg-stone-50"><tr><th class="px-6 py-3 text-left text-xs font-medium text-stone-500 uppercase">Time (min)</th><th class="px-6 py-3 text-left text-xs font-medium text-stone-500 uppercase">Temp (°C)</th></tr></thead>
+                            <tbody id="generated-table-body" class="bg-white divide-y divide-stone-200 font-mono text-sm text-stone-700"></tbody>
                         </table>
                     </div>
-                    
                     <div class="mt-6 space-y-4">
-                        <h3 class="font-bold text-stone-800">Step 3: Analyze & Predict</h3>
+                        <h3 class="font-bold text-stone-800">Analysis Tasks</h3>
                         <div class="p-4 bg-stone-50 rounded border border-stone-200 text-sm space-y-2">
-                            <p><strong>a) Test Models:</strong> Run Linear, Quadratic, and Exponential regressions. Record $r^2$.</p>
-                            <p><strong>b) Justify:</strong> Which model fits best? (Hint: Coffee cools rapidly then slows down).</p>
-                            <p><strong>c) Extrapolate:</strong> Predict Temp at 200 mins.</p>
-                        </div>
-                        
-                        <!-- Simple Prediction Checker -->
-                        <div class="mt-4 pt-4 border-t border-stone-200">
-                            <label class="text-xs font-bold text-stone-500 uppercase">Sanity Check Helper</label>
-                            <div class="flex gap-2 mt-2">
-                                <input type="number" id="sanity-check-input" placeholder="Your prediction (e.g., -5)" class="p-2 border rounded text-sm w-32">
-                                <button onclick="checkSanity()" class="text-xs bg-stone-200 hover:bg-stone-300 px-3 rounded text-stone-700">Check</button>
-                            </div>
-                            <p id="sanity-msg" class="text-xs mt-2 italic text-stone-500"></p>
+                            <p><strong>a) Test Models:</strong> Find $r^2$ for Linear, Quadratic, Exponential.</p>
+                            <p><strong>b) Select:</strong> Which fits best?</p>
+                            <p><strong>c) Predict:</strong> Temp at 200 mins?</p>
                         </div>
                     </div>
                 </div>
-
-                <!-- Visualization -->
                 <div>
                     <h3 class="font-bold text-stone-800 mb-4">Visual Verification</h3>
                     <div class="bg-white p-4 rounded-xl border border-stone-200 shadow-sm">
-                        <div class="chart-container">
-                            <canvas id="chartC"></canvas>
-                        </div>
-                        <p class="text-center text-xs text-stone-400 mt-2">This is how your data should look in Desmos.</p>
+                        <div class="chart-container"><canvas id="chartC"></canvas></div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- SECTION: Reference -->
-    <section id="reference" class="hidden space-y-6">
+    <!-- SECTION: Part D -->
+    <section id="part-d" class="hidden space-y-6 fade-in">
         <div class="glass-panel p-6 md:p-8">
+            <div class="border-b border-stone-200 pb-4 mb-6"><h2 class="text-2xl font-bold text-stone-800">Part D: The "Missing Link"</h2></div>
+            <div class="grid lg:grid-cols-2 gap-8 items-start">
+                <div class="space-y-6">
+                    <p class="text-stone-600"><strong>Scenario:</strong> A biologist missed a measurement on Day 3 for a fast-growing sapling. Compare Interpolation vs. Extrapolation.</p>
+                    
+                    <!-- Input D -->
+                    <div class="bg-indigo-50 p-6 rounded-lg border border-indigo-100 shadow-sm">
+                        <label class="block text-sm font-bold text-indigo-900 mb-2">Last Digit of ID ($N$):</label>
+                        <div class="flex gap-4">
+                            <input type="number" id="part-d-input" min="0" max="9" class="w-32 p-2 border border-indigo-300 rounded focus:ring-indigo-500" placeholder="e.g. 7">
+                            <button onclick="generatePartD()" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 text-sm">Update Data</button>
+                        </div>
+                    </div>
+
+                    <div id="part-d-data" class="hidden">
+                         <table class="w-full text-sm border-collapse border border-indigo-200 mb-4 bg-white">
+                            <tr class="bg-indigo-100 font-bold"><td class="p-2 border border-indigo-200">Day (x)</td><td class="p-2 border border-indigo-200">1</td><td class="p-2 border border-indigo-200">2</td><td class="p-2 border border-indigo-200">4</td><td class="p-2 border border-indigo-200">5</td></tr>
+                            <tr><td class="p-2 border border-indigo-200 font-bold">Height (cm)</td><td class="p-2 border border-indigo-200">5</td><td class="p-2 border border-indigo-200">8</td><td class="p-2 border border-indigo-200">14</td><td class="p-2 border border-indigo-200 font-bold text-indigo-700" id="part-d-val">--</td></tr>
+                        </table>
+                        <div class="bg-white p-4 rounded border border-stone-200 text-sm space-y-2">
+                            <p><strong>a) Model:</strong> Find the Line of Best Fit ($y=mx+b$) in Desmos.</p>
+                            <p><strong>b) Interpolate:</strong> Predict height on <strong>Day 3</strong>.</p>
+                            <p><strong>c) Extrapolate:</strong> Predict height on <strong>Day 50</strong>.</p>
+                            <p><strong>d) Analysis:</strong> Which is more reliable? Why?</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Chart D -->
+                <div class="bg-white p-4 rounded-xl border border-stone-200 shadow-sm">
+                    <h4 class="text-center font-medium text-indigo-900 mb-2">Plant Growth Visualizer</h4>
+                    <div class="chart-container"><canvas id="chartD"></canvas></div>
+                    <p class="text-xs text-center text-stone-400 mt-2">Dotted line shows extrapolation path.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION: Part E -->
+    <section id="part-e" class="hidden space-y-6 fade-in">
+        <div class="glass-panel p-6 md:p-8">
+            <div class="border-b border-stone-200 pb-4 mb-6"><h2 class="text-2xl font-bold text-stone-800">Part E: The "Outlier" Impact</h2></div>
+            <div class="grid lg:grid-cols-2 gap-8 items-start">
+                <div class="space-y-6">
+                     <p class="text-stone-600"><strong>Scenario:</strong> You have a "Perfect Study Group" where hours studied correlates perfectly with scores ($r=1$). What happens when a unique outlier joins?</p>
+                    
+                     <!-- Input E -->
+                    <div class="bg-amber-50 p-6 rounded-lg border border-amber-100 shadow-sm">
+                        <label class="block text-sm font-bold text-amber-900 mb-2">Last Digit of ID ($N$):</label>
+                        <div class="flex gap-4">
+                            <input type="number" id="part-e-input" min="0" max="9" class="w-32 p-2 border border-amber-300 rounded focus:ring-amber-500" placeholder="e.g. 2">
+                            <button onclick="generatePartE()" class="bg-amber-600 text-white px-4 py-2 rounded hover:bg-amber-700 text-sm">Add Outlier</button>
+                        </div>
+                    </div>
+
+                    <div id="part-e-data" class="hidden bg-white p-4 rounded border border-stone-200 text-sm space-y-2">
+                        <p><strong>Baseline:</strong> Points (1,10), (2,20), (3,30), (4,40), (5,50). $r=1$.</p>
+                        <p><strong>Your Outlier:</strong> <span class="font-bold text-amber-600 text-lg">(10, <span id="outlier-y">N</span>)</span></p>
+                        <hr class="my-2">
+                        <p><strong>Task:</strong> Add this point in Desmos. Record the <strong>new $r$</strong>. Explain the change.</p>
+                    </div>
+                </div>
+                <!-- Chart E -->
+                 <div class="bg-white p-4 rounded-xl border border-stone-200 shadow-sm">
+                    <div class="flex justify-between items-center mb-2">
+                         <h4 class="font-medium text-amber-900">Leverage Visualizer</h4>
+                         <span id="part-e-r" class="text-xs font-mono bg-stone-100 px-2 py-1 rounded">r = 1.00</span>
+                    </div>
+                    <div class="chart-container"><canvas id="chartE"></canvas></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION: Reference -->
+    <section id="reference" class="hidden space-y-6 fade-in">
+        <div class="glass-panel p-6 md:p-8">
+            <h2 class="text-2xl font-bold text-stone-800 mb-6">Reference Guide</h2>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="bg-white p-6 rounded-lg border border-stone-200 shadow-sm"><h3 class="text-sky-700 font-bold mb-2">Correlation ($r$)</h3><p class="text-sm text-stone-600">Measures linear strength. -1 to +1.</p></div>
+                <div class="bg-white p-6 rounded-lg border border-stone-200 shadow-sm"><h3 class="text-emerald-700 font-bold mb-2">Determination ($r^2$)</h3><p class="text-sm text-stone-600">Percentage of fit. Best for comparing curves.</p></div>
+                <div class="bg-white p-6 rounded-lg border border-stone-200 shadow-sm"><h3 class="text-indigo-700 font-bold mb-2">Interpolation</h3><p class="text-sm text-stone-600">Predicting <strong>inside</strong> the data range. Usually reliable.</p></div>
+                <div class="bg-white p-6 rounded-lg border border-stone-200 shadow-sm"><h3 class="text-amber-700 font-bold mb-2">Extrapolation</h3><p class="text-sm text-stone-600">Predicting <strong>outside</strong> the data range. Often unreliable.</p></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION: TEACHER GRADING MODE -->
+    <section id="teacher-mode" class="hidden space-y-6 fade-in">
+        <div class="glass-panel p-6 md:p-8 border-l-8 border-purple-600">
             <div class="border-b border-stone-200 pb-4 mb-6">
-                <h2 class="text-2xl font-bold text-stone-800">Reference Guide</h2>
-                <p class="text-stone-500 mt-1">Key Concepts from Unit 6</p>
+                <h2 class="text-2xl font-bold text-purple-900">👩‍🏫 Teacher Grading Mode</h2>
+                <p class="text-stone-500 mt-1">Generate the Answer Key for any student.</p>
+            </div>
+            
+            <div class="bg-purple-50 p-6 rounded-lg border border-purple-100 shadow-sm mb-8">
+                <label class="block text-sm font-bold text-purple-800 mb-2">Enter Student ID from their Answer Sheet:</label>
+                <div class="flex gap-4 items-center">
+                    <input type="text" id="teacher-id-input" class="flex-1 max-w-xs p-3 border border-purple-300 rounded-md focus:ring-purple-500 font-mono tracking-widest" placeholder="e.g. 123456789">
+                    <button onclick="generateAnswerKey()" class="bg-purple-700 text-white px-6 py-3 rounded-md hover:bg-purple-800 font-medium shadow-md">Get Answer Key</button>
+                </div>
             </div>
 
-            <div class="grid md:grid-cols-2 gap-6">
-                <!-- Concept Card 1 -->
-                <div class="bg-white p-6 rounded-lg border border-stone-200 shadow-sm hover:shadow-md transition">
-                    <h3 class="text-sky-700 font-bold mb-2">Correlation Coefficient ($r$)</h3>
-                    <p class="text-sm text-stone-600 mb-3">Measures the <strong>strength and direction</strong> of a <em>linear</em> relationship.</p>
-                    <div class="flex justify-between text-xs text-stone-400 font-mono bg-stone-50 p-2 rounded">
-                        <span>-1 (Perf. Neg)</span>
-                        <span>0 (None)</span>
-                        <span>+1 (Perf. Pos)</span>
+            <div id="key-result" class="hidden grid md:grid-cols-2 gap-8">
+                <!-- Key Part A -->
+                <div class="bg-white p-6 rounded-lg border border-stone-200 shadow-sm">
+                    <h3 class="font-bold text-stone-800 mb-2 border-b pb-2">Part A (Constraint)</h3>
+                    <p class="text-xs text-stone-500 uppercase font-bold">Target Y-Intercept</p>
+                    <p class="text-2xl font-mono font-bold text-purple-700" id="key-intercept">--</p>
+                </div>
+
+                <!-- Key Part C -->
+                <div class="bg-white p-6 rounded-lg border border-stone-200 shadow-sm">
+                    <h3 class="font-bold text-stone-800 mb-2 border-b pb-2">Part C (Coffee)</h3>
+                    <div class="grid grid-cols-2 gap-2 text-sm">
+                        <div>Start Temp: <span id="key-start" class="font-mono font-bold">--</span></div>
+                        <div>t=200 Pred: <span id="key-prediction" class="font-mono font-bold text-emerald-700">--</span></div>
                     </div>
                 </div>
 
-                <!-- Concept Card 2 -->
-                <div class="bg-white p-6 rounded-lg border border-stone-200 shadow-sm hover:shadow-md transition">
-                    <h3 class="text-emerald-700 font-bold mb-2">Coefficient of Determination ($r^2$)</h3>
-                    <p class="text-sm text-stone-600">Measures the % of variation explained by the model. Used for <strong>comparing models</strong> (Linear vs Non-Linear).</p>
-                    <p class="text-xs text-stone-500 mt-2">Range: 0% to 100% (0 to 1)</p>
+                <!-- Key Part D -->
+                <div class="bg-white p-6 rounded-lg border border-stone-200 shadow-sm">
+                    <h3 class="font-bold text-stone-800 mb-2 border-b pb-2">Part D (Missing Link)</h3>
+                    <p class="text-xs text-stone-500 mb-1">Unique Point: (5, <span id="key-d-point"></span>)</p>
+                    <p class="text-xs text-stone-500">Eqn: <span id="key-d-eqn" class="font-mono"></span></p>
+                    <div class="mt-2 grid grid-cols-2 gap-2 text-sm bg-indigo-50 p-2 rounded">
+                        <div class="font-bold text-indigo-800">Day 3 (Interp): <br><span id="key-d-interp" class="font-mono text-lg">--</span></div>
+                        <div class="font-bold text-indigo-800">Day 50 (Extrap): <br><span id="key-d-extrap" class="font-mono text-lg">--</span></div>
+                    </div>
                 </div>
 
-                <!-- Concept Card 3 -->
-                <div class="bg-white p-6 rounded-lg border border-stone-200 shadow-sm hover:shadow-md transition">
-                    <h3 class="text-amber-700 font-bold mb-2">Interpolation vs Extrapolation</h3>
-                    <ul class="text-sm text-stone-600 space-y-2">
-                        <li><strong>Interpolation:</strong> Predicting <em>inside</em> the data range. Usually reliable.</li>
-                        <li><strong>Extrapolation:</strong> Predicting <em>outside</em> the data range. Risky (e.g., predicting coffee freezes).</li>
-                    </ul>
-                </div>
-                
-                <!-- Concept Card 4 -->
-                <div class="bg-white p-6 rounded-lg border border-stone-200 shadow-sm hover:shadow-md transition">
-                    <h3 class="text-purple-700 font-bold mb-2">Regression Types</h3>
-                    <ul class="text-sm text-stone-600 space-y-1">
-                        <li><strong>Linear:</strong> Constant rate of change ($y=mx+b$).</li>
-                        <li><strong>Quadratic:</strong> Parabolic, gravity ($y=ax^2+bx+c$).</li>
-                        <li><strong>Exponential:</strong> % change, cooling/growth ($y=ab^x$).</li>
-                    </ul>
+                <!-- Key Part E -->
+                <div class="bg-white p-6 rounded-lg border border-stone-200 shadow-sm">
+                    <h3 class="font-bold text-stone-800 mb-2 border-b pb-2">Part E (Outlier)</h3>
+                    <p class="text-xs text-stone-500 mb-2">Outlier Point: (10, <span id="key-e-point"></span>)</p>
+                    <div class="bg-amber-50 p-2 rounded text-center">
+                        <p class="text-xs text-amber-800 uppercase font-bold">New Correlation (r)</p>
+                        <p class="text-2xl font-mono font-bold text-amber-700" id="key-e-r">--</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -391,220 +332,198 @@
 
 </main>
 
-<!-- Mobile Menu Logic & Navigation -->
 <script>
-    // --- Navigation Logic ---
+    // --- Navigation ---
     function navigateTo(sectionId) {
-        // Hide all sections
-        document.querySelectorAll('main > section').forEach(sec => {
-            sec.classList.add('hidden');
-        });
-        // Show target section
-        document.getElementById(sectionId).classList.remove('hidden');
+        document.querySelectorAll('main > section').forEach(sec => sec.classList.remove('active', 'fade-in')); // clear animation
+        document.querySelectorAll('main > section').forEach(sec => sec.classList.add('hidden'));
         
-        // Update active state in sidebar
+        const target = document.getElementById(sectionId);
+        target.classList.remove('hidden');
+        target.classList.add('fade-in'); // trigger animation
+        
         document.querySelectorAll('.nav-item').forEach(btn => {
             btn.classList.remove('active');
-            if (btn.getAttribute('onclick').includes(sectionId)) {
-                btn.classList.add('active');
-            }
+            if (btn.getAttribute('onclick').includes(sectionId)) btn.classList.add('active');
         });
-
-        // Mobile menu close
-        const sidebar = document.getElementById('sidebar');
-        if (window.innerWidth < 768) {
-            sidebar.classList.add('-translate-x-full');
-        }
+        if (window.innerWidth < 768) document.getElementById('sidebar').classList.add('-translate-x-full');
     }
-
-    // Initialize view
+    document.getElementById('mobile-menu-btn').addEventListener('click', () => document.getElementById('sidebar').classList.toggle('-translate-x-full'));
     navigateTo('intro');
-
-    // Mobile menu toggle
-    document.getElementById('mobile-menu-btn').addEventListener('click', () => {
-        const sidebar = document.getElementById('sidebar');
-        sidebar.classList.toggle('-translate-x-full');
-    });
 
     // --- Part A Logic ---
     document.getElementById('part-a-input').addEventListener('input', function(e) {
         const val = parseInt(e.target.value);
-        const resultDiv = document.getElementById('part-a-result');
-        const targetSpan = document.getElementById('target-intercept');
-        
         if (!isNaN(val) && val >= 0 && val <= 9) {
-            resultDiv.classList.remove('hidden');
-            targetSpan.innerText = `~${10 + val}`;
-        } else {
-            resultDiv.classList.add('hidden');
-        }
+            document.getElementById('part-a-result').classList.remove('hidden');
+            document.getElementById('target-intercept').innerText = `~${10 + val}`;
+        } else { document.getElementById('part-a-result').classList.add('hidden'); }
     });
 
-    // --- Part B Logic & Chart ---
+    // --- Part B Logic ---
     const ctxB = document.getElementById('chartB').getContext('2d');
     const dataB_X = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5];
     const dataB_Y = [9, 15, 19, 20, 19, 16, 10];
-    
-    // Linear prediction (bad fit)
-    const linearData = dataB_X.map(x => 10.7 + 2.4 * x); // Approx linear fit
-    
-    // Quadratic prediction (good fit)
-    // Vertex approx (2, 20). y = -4(x-2)^2 + 20
-    const quadData = dataB_X.map(x => -4.4 * Math.pow(x - 2, 2) + 20.2);
-
     let chartB = new Chart(ctxB, {
         type: 'scatter',
-        data: {
-            datasets: [{
-                label: 'Observed Data',
-                data: dataB_X.map((x, i) => ({x, y: dataB_Y[i]})),
-                backgroundColor: '#1c1917', // stone-900
-                pointRadius: 6
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                x: { title: { display: true, text: 'Time (s)' }, min: 0, max: 4 },
-                y: { title: { display: true, text: 'Height (m)' }, min: 0, max: 25 }
-            },
-            plugins: {
-                legend: { position: 'bottom' }
-            }
-        }
+        data: { datasets: [{ label: 'Observed', data: dataB_X.map((x, i) => ({x, y: dataB_Y[i]})), backgroundColor: '#1c1917', pointRadius: 6 }] },
+        options: { responsive: true, maintainAspectRatio: false, scales: { x: {min:0, max:4}, y: {min:0, max:25} } }
     });
-
     function updateChartB(type) {
-        const statsDiv = document.getElementById('model-stats');
-        
-        // Remove existing trendlines
-        chartB.data.datasets = chartB.data.datasets.filter(d => d.label === 'Observed Data');
-
+        const stats = document.getElementById('model-stats');
+        chartB.data.datasets = chartB.data.datasets.filter(d => d.label === 'Observed');
         if (type === 'linear') {
-            chartB.data.datasets.push({
-                label: 'Linear Model',
-                data: dataB_X.map((x, i) => ({x, y: linearData[i]})),
-                type: 'line',
-                borderColor: '#ef4444', // red-500
-                borderWidth: 2,
-                pointRadius: 0,
-                fill: false,
-                tension: 0
-            });
-            statsDiv.innerHTML = `<strong>Linear Model:</strong> $r = 0.05$ (Very Weak). Note how the line ignores the curve.`;
-        } else if (type === 'quadratic') {
-            chartB.data.datasets.push({
-                label: 'Quadratic Model',
-                data: dataB_X.map((x, i) => ({x, y: quadData[i]})),
-                type: 'line',
-                borderColor: '#0284c7', // sky-600
-                borderWidth: 2,
-                pointRadius: 0,
-                fill: false,
-                tension: 0.4
-            });
-            statsDiv.innerHTML = `<strong>Quadratic Model:</strong> $r^2 \\approx 0.99$ (Strong Fit). Matches the physics of gravity.`;
+            chartB.data.datasets.push({ type: 'line', label: 'Linear', data: dataB_X.map(x => ({x, y: 10.7 + 2.4*x})), borderColor: '#ef4444', borderWidth: 2, pointRadius: 0 });
+            stats.innerHTML = `<strong>Linear:</strong> $r = 0.05$ (Fail). Line ignores curve.`;
+        } else {
+            chartB.data.datasets.push({ type: 'line', label: 'Quadratic', data: dataB_X.map(x => ({x, y: -4.4*Math.pow(x-2,2)+20.2})), borderColor: '#0284c7', borderWidth: 2, pointRadius: 0 });
+            stats.innerHTML = `<strong>Quadratic:</strong> $r^2 \\approx 0.99$ (Pass). Matches physics.`;
         }
         chartB.update();
     }
 
-    // --- Part C Logic & Chart ---
+    // --- Part C Logic ---
     let chartC = null;
-
-    function generateUniqueData() {
-        const idInput = document.getElementById('student-id-input').value;
-        const contentDiv = document.getElementById('part-c-content');
-        
-        if (idInput.length < 1) {
-            alert("Please enter a Student ID.");
-            return;
-        }
-
-        const lastDigit = parseInt(idInput.slice(-1));
-        if (isNaN(lastDigit)) {
-            alert("Invalid ID format.");
-            return;
-        }
-
-        contentDiv.classList.remove('hidden');
-
-        // Generate Data: Coffee Cooling
-        // Base: 95, 76.1, 61.2, 49.5, 40.8, 34.1
-        // Modified: First value is 95 + N. Others stay relative or decay from new max? 
-        // Instructions say: "Take standard starting temp (95) and add N. Everyone's data slightly different."
-        // Implicitly, the cooling CURVE might shift. 
-        // For simplicity and robustness, we will shift the whole curve up by N degrees, or just change t=0.
-        // "Your first point is 95 + N". 
-        // If we only change the first point, the curve gets weird. Let's assume we shift the starting temp and the rest follows a similar decay pattern relative to room temp (20).
-        // T(t) = (T_initial - T_room) * e^(-k*t) + T_room.
-        // Standard: Start 95. Room 20. Diff 75.
-        // New: Start 95 + N. Room 20. Diff 75 + N.
-        
-        const T_room = 20;
-        const k = 0.044; // Approx decay constant for the provided data
+    const T_room = 20; const k = 0.044; 
+    function getCoffeeData(idStr) {
+        const lastDigit = parseInt(idStr.slice(-1));
+        if (isNaN(lastDigit)) return null;
         const T_initial = 95 + lastDigit;
-        
         const times = [0, 5, 10, 15, 20, 25];
-        // Calculate theoretical temps for smooth curve
-        const uniqueData = times.map(t => {
+        const data = times.map(t => {
             const temp = (T_initial - T_room) * Math.exp(-k * t) + T_room;
             return { x: t, y: parseFloat(temp.toFixed(1)) };
         });
-
-        // Populate Table
+        return { data, T_initial, lastDigit };
+    }
+    function generateUniqueData() {
+        const id = document.getElementById('student-id-input').value;
+        const result = getCoffeeData(id);
+        if (!result) { alert("Invalid ID"); return; }
+        document.getElementById('part-c-content').classList.remove('hidden');
         const tbody = document.getElementById('generated-table-body');
         tbody.innerHTML = '';
-        uniqueData.forEach(pt => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `<td class="px-6 py-4 whitespace-nowrap">${pt.x}</td><td class="px-6 py-4 whitespace-nowrap font-bold text-emerald-700">${pt.y}</td>`;
-            tbody.appendChild(tr);
-        });
-
-        // Update Chart C
+        result.data.forEach(pt => tbody.innerHTML += `<tr><td class="px-6 py-4">${pt.x}</td><td class="px-6 py-4 font-bold text-emerald-700">${pt.y}</td></tr>`);
         const ctxC = document.getElementById('chartC').getContext('2d');
         if (chartC) chartC.destroy();
-
         chartC = new Chart(ctxC, {
             type: 'scatter',
-            data: {
-                datasets: [{
-                    label: `Student ${idInput.slice(-4)}'s Data`,
-                    data: uniqueData,
-                    backgroundColor: '#059669', // emerald-600
-                    borderColor: '#059669',
-                    showLine: true,
-                    tension: 0.3
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    x: { title: { display: true, text: 'Time (min)' }, min: 0 },
-                    y: { title: { display: true, text: 'Temp (°C)' }, min: 0 }
-                }
-            }
+            data: { datasets: [{ label: `Student Data`, data: result.data, backgroundColor: '#059669', showLine: true }] },
+            options: { responsive: true, maintainAspectRatio: false, scales: { y: {min: 0} } }
         });
     }
 
-    function checkSanity() {
-        const val = parseFloat(document.getElementById('sanity-check-input').value);
-        const msg = document.getElementById('sanity-msg');
-        
+    // --- Part D Logic (Missing Link) ---
+    let chartD = null;
+    function generatePartD() {
+        const val = parseInt(document.getElementById('part-d-input').value);
         if (isNaN(val)) return;
-
-        if (val <= 0) {
-            msg.innerText = "Physics Alert! Coffee can't freeze in a classroom (unless your school is in Antarctica).";
-            msg.className = "text-xs mt-2 font-bold text-red-600";
-        } else if (val < 20) {
-            msg.innerText = "Careful: This is below room temperature (approx 20°C). Is that likely?";
-            msg.className = "text-xs mt-2 font-bold text-amber-600";
-        } else {
-            msg.innerText = "That seems physically possible (above room temp).";
-            msg.className = "text-xs mt-2 font-bold text-green-600";
-        }
+        
+        const p4_y = 17 + val;
+        document.getElementById('part-d-data').classList.remove('hidden');
+        document.getElementById('part-d-val').innerText = p4_y;
+        
+        // Regression Logic
+        const pts = [{x:1, y:5}, {x:2, y:8}, {x:4, y:14}, {x:5, y:p4_y}];
+        // Calc stats for line
+        let sumX=12, sumY=27+p4_y, sumXY=77+5*p4_y, sumX2=46, n=4;
+        let m = (n*sumXY - sumX*sumY) / (n*sumX2 - sumX*sumX);
+        let b = (sumY - m*sumX) / n;
+        
+        // Visual Data (Extrapolating to 50)
+        const lineData = [{x:0, y:b}, {x:50, y:m*50+b}];
+        
+        const ctxD = document.getElementById('chartD').getContext('2d');
+        if (chartD) chartD.destroy();
+        chartD = new Chart(ctxD, {
+            type: 'scatter',
+            data: {
+                datasets: [
+                    { label: 'Observed', data: pts, backgroundColor: '#4338ca', pointRadius: 6 },
+                    { label: 'Trend', data: lineData, type:'line', borderColor: '#818cf8', borderDash: [5,5], pointRadius: 0 }
+                ]
+            },
+            options: { responsive: true, maintainAspectRatio: false, scales: { x: {max: 55} } }
+        });
     }
 
+    // --- Part E Logic (Outlier) ---
+    let chartE = null;
+    function generatePartE() {
+        const val = parseInt(document.getElementById('part-e-input').value);
+        if (isNaN(val)) return;
+        
+        const outlierY = val;
+        document.getElementById('part-e-data').classList.remove('hidden');
+        document.getElementById('outlier-y').innerText = outlierY;
+        
+        const originalPts = [{x:1, y:10}, {x:2, y:20}, {x:3, y:30}, {x:4, y:40}, {x:5, y:50}];
+        const allPts = [...originalPts, {x:10, y:outlierY}];
+        
+        // Calc r
+        // Simple r calc helper
+        function calcR(data) {
+            let n=data.length, sx=0, sy=0, sxy=0, sx2=0, sy2=0;
+            data.forEach(p => { sx+=p.x; sy+=p.y; sxy+=p.x*p.y; sx2+=p.x*p.x; sy2+=p.y*p.y; });
+            let num = n*sxy - sx*sy;
+            let den = Math.sqrt((n*sx2 - sx*sx)*(n*sy2 - sy*sy));
+            return (num/den).toFixed(3);
+        }
+        const newR = calcR(allPts);
+        document.getElementById('part-e-r').innerText = `r = ${newR}`;
+
+        const ctxE = document.getElementById('chartE').getContext('2d');
+        if (chartE) chartE.destroy();
+        chartE = new Chart(ctxE, {
+            type: 'scatter',
+            data: {
+                datasets: [
+                    { label: 'Study Group', data: originalPts, backgroundColor: '#000000', pointRadius: 6 },
+                    { label: 'Outlier', data: [{x:10, y:outlierY}], backgroundColor: '#d97706', pointRadius: 8, pointStyle: 'triangle' }
+                ]
+            },
+            options: { responsive: true, maintainAspectRatio: false, scales: { x: {max: 12}, y: {min:0, max:60} } }
+        });
+    }
+
+    // --- Teacher Logic ---
+    function generateAnswerKey() {
+        const id = document.getElementById('teacher-id-input').value;
+        const resC = getCoffeeData(id);
+        if (!resC) { alert("Enter valid Student ID"); return; }
+        const N = resC.lastDigit;
+
+        document.getElementById('key-result').classList.remove('hidden');
+        
+        // Part A
+        document.getElementById('key-intercept').innerText = `~${10 + N}`;
+
+        // Part C
+        document.getElementById('key-start').innerText = resC.T_initial;
+        const predC = (resC.T_initial - T_room) * Math.exp(-k * 200) + T_room;
+        document.getElementById('key-prediction').innerText = `${predC.toFixed(2)} °C`;
+
+        // Part D
+        // y = (3 + 0.2N)x + (2 - 0.35N)
+        const m = 3 + 0.2*N;
+        const b = 2 - 0.35*N;
+        document.getElementById('key-d-point').innerText = 17+N;
+        document.getElementById('key-d-eqn').innerText = `y = ${m.toFixed(2)}x + ${b.toFixed(2)}`;
+        document.getElementById('key-d-interp').innerText = (m*3 + b).toFixed(2);
+        document.getElementById('key-d-extrap').innerText = (m*50 + b).toFixed(2);
+
+        // Part E
+        // Outlier (10, N). Pts: (1,10)...(5,50), (10,N)
+        // Using logic from scratch:
+        const eData = [{x:1, y:10}, {x:2, y:20}, {x:3, y:30}, {x:4, y:40}, {x:5, y:50}, {x:10, y:N}];
+        let n=6, sx=0, sy=0, sxy=0, sx2=0, sy2=0;
+        eData.forEach(p => { sx+=p.x; sy+=p.y; sxy+=p.x*p.y; sx2+=p.x*p.x; sy2+=p.y*p.y; });
+        let num = n*sxy - sx*sy;
+        let den = Math.sqrt((n*sx2 - sx*sx)*(n*sy2 - sy*sy));
+        const rE = num/den;
+        
+        document.getElementById('key-e-point').innerText = N;
+        document.getElementById('key-e-r').innerText = rE.toFixed(4);
+    }
 </script>
 </body> </html>
