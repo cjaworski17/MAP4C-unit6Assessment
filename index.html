@@ -358,17 +358,17 @@
 
 <script>
     // --- Secret Trigger Logic ---
-let secretClicks = 0;
-function checkTeacherSecret() {
-    secretClicks++;
-    // If clicked 5 times...
-    if (secretClicks >= 5) {
-        navigateTo('teacher-mode');
-        secretClicks = 0; // Reset
+    let secretClicks = 0;
+    function checkTeacherSecret() {
+        secretClicks++;
+        // If clicked 5 times...
+        if (secretClicks >= 5) {
+            navigateTo('teacher-mode');
+            secretClicks = 0; // Reset
+        }
+        // Reset count if you stop clicking for 2 seconds
+        setTimeout(() => { if(secretClicks > 0) secretClicks--; }, 2000);
     }
-    // Reset count if you stop clicking for 2 seconds
-    setTimeout(() => { if(secretClicks > 0) secretClicks--; }, 2000);
-}
 
     // --- Navigation ---
     function navigateTo(sectionId) {
