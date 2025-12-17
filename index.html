@@ -111,14 +111,14 @@
                     <div class="bg-white p-6 rounded-lg border border-stone-200 shadow-sm">
                         <h3 class="font-bold text-stone-800 mb-4 border-b pb-2">Constraint Calculator</h3>
                         <div class="mb-4">
-                            <label class="block text-sm font-medium text-stone-700 mb-1">Enter Last Digit of ID ($N$):</label>
+                            <label class="block text-sm font-medium text-stone-700 mb-1">Enter Last Digit of ID (<i>N</i>):</label>
                             <input type="number" id="part-a-input" min="0" max="9" class="w-full p-3 border border-stone-300 rounded-md focus:ring-sky-500" placeholder="e.g., 5">
                         </div>
                         <div id="part-a-result" class="hidden bg-sky-50 p-4 rounded-md border border-sky-100">
                             <p class="text-sm text-sky-900 font-medium">Your Unique Criteria:</p>
                             <ul class="list-disc pl-5 text-sm text-sky-800 mt-2 space-y-1">
                                 <li>Relationship: <strong>Linear & Negative</strong></li>
-                                <li>Correlation ($r$): <strong>-0.60 to -0.80</strong></li>
+                                <li>Correlation (<i>r</i>): <strong>-0.60 to -0.80</strong></li>
                                 <li>Target Y-Intercept: <strong id="target-intercept" class="text-lg">--</strong></li>
                             </ul>
                         </div>
@@ -128,7 +128,7 @@
                     <h3 class="font-semibold text-stone-800 mb-3">Your Tasks</h3>
                     <ol class="list-decimal pl-5 space-y-3 text-stone-700">
                         <li><strong>Create Table:</strong> In Desmos, make a table (10+ points) matching the criteria.</li>
-                        <li><strong>Screenshot:</strong> Capture table, graph, and regression ($r, m, b$).</li>
+                        <li><strong>Screenshot:</strong> Capture table, graph, and regression (<i>r, m, b</i>).</li>
                         <li><strong>Explain:</strong> Discuss the visual "scatter" relative to the line.</li>
                     </ol>
                 </div>
@@ -143,7 +143,7 @@
             <div class="grid lg:grid-cols-2 gap-8 items-start">
                 <div class="space-y-6">
                     <div class="bg-rose-50 border-l-4 border-rose-400 p-4 rounded-r">
-                        <p class="text-rose-700 text-sm">Analyst says: <em>"Since $r=0.05$, the data is random."</em></p>
+                        <p class="text-rose-700 text-sm">Analyst says: <em>"Since <i>r=0.05</i>, the data is random."</em></p>
                     </div>
                     <div>
                         <div class="flex gap-2 mb-4">
@@ -155,8 +155,8 @@
                     <div class="bg-white p-5 rounded-lg border border-stone-200">
                         <h3 class="font-semibold text-stone-800 mb-2">Your Tasks</h3>
                         <ul class="list-disc pl-5 space-y-2 text-sm text-stone-600">
-                            <li><strong>Identify Error:</strong> Why is $r=0.05$ misleading?</li>
-                            <li><strong>Correct Metric:</strong> Why use $r^2$?</li>
+                            <li><strong>Identify Error:</strong> Why is <i>r=0.05</i> misleading?</li>
+                            <li><strong>Correct Metric:</strong> Why use <i>r^2</i>?</li>
                             <li><strong>Correct Model:</strong> Which shape fits the physics?</li>
                         </ul>
                     </div>
@@ -191,7 +191,7 @@
                     <div class="mt-6 space-y-4">
                         <h3 class="font-bold text-stone-800">Analysis Tasks</h3>
                         <div class="p-4 bg-stone-50 rounded border border-stone-200 text-sm space-y-2">
-                            <p><strong>a) Test Models:</strong> Find $r^2$ for Linear, Quadratic, Exponential.</p>
+                            <p><strong>a) Test Models:</strong> Find <i>r^2</i> for Linear, Quadratic, Exponential.</p>
                             <p><strong>b) Select:</strong> Which fits best?</p>
                             <p><strong>c) Predict:</strong> Temp at 200 mins?</p>
                         </div>
@@ -217,7 +217,7 @@
                     
                     <!-- Input D -->
                     <div class="bg-indigo-50 p-6 rounded-lg border border-indigo-100 shadow-sm">
-                        <label class="block text-sm font-bold text-indigo-900 mb-2">Last Digit of ID ($N$):</label>
+                        <label class="block text-sm font-bold text-indigo-900 mb-2">Last Digit of ID (<i>N</i>):</label>
                         <div class="flex gap-4">
                             <input type="number" id="part-d-input" min="0" max="9" class="w-32 p-2 border border-indigo-300 rounded focus:ring-indigo-500" placeholder="e.g. 7">
                             <button onclick="generatePartD()" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 text-sm">Update Data</button>
@@ -230,7 +230,7 @@
                             <tr><td class="p-2 border border-indigo-200 font-bold">Height (cm)</td><td class="p-2 border border-indigo-200">5</td><td class="p-2 border border-indigo-200">8</td><td class="p-2 border border-indigo-200">14</td><td class="p-2 border border-indigo-200 font-bold text-indigo-700" id="part-d-val">--</td></tr>
                         </table>
                         <div class="bg-white p-4 rounded border border-stone-200 text-sm space-y-2">
-                            <p><strong>a) Model:</strong> Find the Line of Best Fit ($y=mx+b$) in Desmos.</p>
+                            <p><strong>a) Model:</strong> Find the Line of Best Fit (<i>y=mx+b</i>) in Desmos.</p>
                             <p><strong>b) Interpolate:</strong> Predict height on <strong>Day 3</strong>.</p>
                             <p><strong>c) Extrapolate:</strong> Predict height on <strong>Day 50</strong>.</p>
                             <p><strong>d) Analysis:</strong> Which is more reliable? Why?</p>
@@ -253,11 +253,11 @@
             <div class="border-b border-stone-200 pb-4 mb-6"><h2 class="text-2xl font-bold text-stone-800">Part E: The "Outlier" Impact</h2></div>
             <div class="grid lg:grid-cols-2 gap-8 items-start">
                 <div class="space-y-6">
-                     <p class="text-stone-600"><strong>Scenario:</strong> You have a "Perfect Study Group" where hours studied correlates perfectly with scores ($r=1$). What happens when a unique outlier joins?</p>
+                     <p class="text-stone-600"><strong>Scenario:</strong> You have a "Perfect Study Group" where hours studied correlates perfectly with scores (<i>r=1</i>). What happens when a unique outlier joins?</p>
                     
                      <!-- Input E -->
                     <div class="bg-amber-50 p-6 rounded-lg border border-amber-100 shadow-sm">
-                        <label class="block text-sm font-bold text-amber-900 mb-2">Last Digit of ID ($N$):</label>
+                        <label class="block text-sm font-bold text-amber-900 mb-2">Last Digit of ID (<i>N</i>):</label>
                         <div class="flex gap-4">
                             <input type="number" id="part-e-input" min="0" max="9" class="w-32 p-2 border border-amber-300 rounded focus:ring-amber-500" placeholder="e.g. 2">
                             <button onclick="generatePartE()" class="bg-amber-600 text-white px-4 py-2 rounded hover:bg-amber-700 text-sm">Add Outlier</button>
@@ -265,10 +265,10 @@
                     </div>
 
                     <div id="part-e-data" class="hidden bg-white p-4 rounded border border-stone-200 text-sm space-y-2">
-                        <p><strong>Baseline:</strong> Points (1,10), (2,20), (3,30), (4,40), (5,50). $r=1$.</p>
+                        <p><strong>Baseline:</strong> Points (1,10), (2,20), (3,30), (4,40), (5,50). <i>r=1</i>.</p>
                         <p><strong>Your Outlier:</strong> <span class="font-bold text-amber-600 text-lg">(10, <span id="outlier-y">N</span>)</span></p>
                         <hr class="my-2">
-                        <p><strong>Task:</strong> Add this point in Desmos. Record the <strong>new $r$</strong>. Explain the change.</p>
+                        <p><strong>Task:</strong> Add this point in Desmos. Record the <strong>new <i>r</i></strong>. Explain the change.</p>
                     </div>
                 </div>
                 <!-- Chart E -->
@@ -288,8 +288,8 @@
         <div class="glass-panel p-6 md:p-8">
             <h2 class="text-2xl font-bold text-stone-800 mb-6">Reference Guide</h2>
             <div class="grid md:grid-cols-2 gap-6">
-                <div class="bg-white p-6 rounded-lg border border-stone-200 shadow-sm"><h3 class="text-sky-700 font-bold mb-2">Correlation ($r$)</h3><p class="text-sm text-stone-600">Measures linear strength. -1 to +1.</p></div>
-                <div class="bg-white p-6 rounded-lg border border-stone-200 shadow-sm"><h3 class="text-emerald-700 font-bold mb-2">Determination ($r^2$)</h3><p class="text-sm text-stone-600">Percentage of fit. Best for comparing curves.</p></div>
+                <div class="bg-white p-6 rounded-lg border border-stone-200 shadow-sm"><h3 class="text-sky-700 font-bold mb-2">Correlation (<i>r</i>)</h3><p class="text-sm text-stone-600">Measures linear strength. -1 to +1.</p></div>
+                <div class="bg-white p-6 rounded-lg border border-stone-200 shadow-sm"><h3 class="text-emerald-700 font-bold mb-2">Determination (<i>r^2</i>)</h3><p class="text-sm text-stone-600">Percentage of fit. Best for comparing curves.</p></div>
                 <div class="bg-white p-6 rounded-lg border border-stone-200 shadow-sm"><h3 class="text-indigo-700 font-bold mb-2">Interpolation</h3><p class="text-sm text-stone-600">Predicting <strong>inside</strong> the data range. Usually reliable.</p></div>
                 <div class="bg-white p-6 rounded-lg border border-stone-200 shadow-sm"><h3 class="text-amber-700 font-bold mb-2">Extrapolation</h3><p class="text-sm text-stone-600">Predicting <strong>outside</strong> the data range. Often unreliable.</p></div>
             </div>
@@ -394,7 +394,7 @@
         const val = parseInt(e.target.value);
         if (!isNaN(val) && val >= 0 && val <= 9) {
             document.getElementById('part-a-result').classList.remove('hidden');
-            document.getElementById('target-intercept').innerText = `~${10 + val}`;
+            document.getElementById('target-intercept').innerText = `~<i>{10 + val}`;
         } else { document.getElementById('part-a-result').classList.add('hidden'); }
     });
 
@@ -412,10 +412,10 @@
         chartB.data.datasets = chartB.data.datasets.filter(d => d.label === 'Observed');
         if (type === 'linear') {
             chartB.data.datasets.push({ type: 'line', label: 'Linear', data: dataB_X.map(x => ({x, y: 10.7 + 2.4*x})), borderColor: '#ef4444', borderWidth: 2, pointRadius: 0 });
-            stats.innerHTML = `<strong>Linear:</strong> $r = 0.05$ (Fail). Line ignores curve.`;
+            stats.innerHTML = `<strong>Linear:</strong> </i>r = 0.05<i> (Fail). Line ignores curve.`;
         } else {
             chartB.data.datasets.push({ type: 'line', label: 'Quadratic', data: dataB_X.map(x => ({x, y: -4.4*Math.pow(x-2,2)+20.2})), borderColor: '#0284c7', borderWidth: 2, pointRadius: 0 });
-            stats.innerHTML = `<strong>Quadratic:</strong> $r^2 \\approx 0.99$ (Pass). Matches physics.`;
+            stats.innerHTML = `<strong>Quadratic:</strong> </i>r^2 \\approx 0.99<i> (Pass). Matches physics.`;
         }
         chartB.update();
     }
@@ -441,7 +441,7 @@
         document.getElementById('part-c-content').classList.remove('hidden');
         const tbody = document.getElementById('generated-table-body');
         tbody.innerHTML = '';
-        result.data.forEach(pt => tbody.innerHTML += `<tr><td class="px-6 py-4">${pt.x}</td><td class="px-6 py-4 font-bold text-emerald-700">${pt.y}</td></tr>`);
+        result.data.forEach(pt => tbody.innerHTML += `<tr><td class="px-6 py-4"></i>{pt.x}</td><td class="px-6 py-4 font-bold text-emerald-700"><i>{pt.y}</td></tr>`);
         const ctxC = document.getElementById('chartC').getContext('2d');
         if (chartC) chartC.destroy();
         chartC = new Chart(ctxC, {
@@ -505,7 +505,7 @@
             return (num/den).toFixed(3);
         }
         const newR = calcR(allPts);
-        document.getElementById('part-e-r').innerText = `r = ${newR}`;
+        document.getElementById('part-e-r').innerText = `r = </i>{newR}`;
 
         const ctxE = document.getElementById('chartE').getContext('2d');
         if (chartE) chartE.destroy();
@@ -531,19 +531,19 @@
         document.getElementById('key-result').classList.remove('hidden');
         
         // Part A
-        document.getElementById('key-intercept').innerText = `~${10 + N}`;
+        document.getElementById('key-intercept').innerText = `~<i>{10 + N}`;
 
         // Part C
         document.getElementById('key-start').innerText = resC.T_initial;
         const predC = (resC.T_initial - T_room) * Math.exp(-k * 200) + T_room;
-        document.getElementById('key-prediction').innerText = `${predC.toFixed(2)} °C`;
+        document.getElementById('key-prediction').innerText = `</i>{predC.toFixed(2)} °C`;
 
         // Part D
         const m = (4*(77+5*(17+N)) - 12*(27+(17+N))) / (4*46 - 12*12);
         const b = ((27+(17+N)) - m*12) / 4;
         
         document.getElementById('key-d-point').innerText = 17+N;
-        document.getElementById('key-d-eqn').innerText = `y = ${m.toFixed(2)}x + ${b.toFixed(2)}`;
+        document.getElementById('key-d-eqn').innerText = `y = <i>{m.toFixed(2)}x + </i>{b.toFixed(2)}`;
         document.getElementById('key-d-interp').innerText = (m*3 + b).toFixed(2);
         document.getElementById('key-d-extrap').innerText = (m*50 + b).toFixed(2);
 
