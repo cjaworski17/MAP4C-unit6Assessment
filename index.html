@@ -1,14 +1,12 @@
 <!-- Chosen Palette: Warm Neutrals, Academic Blue, Indigo (Part D), Amber (Part E) -->
 
-<!-- Application Structure Plan: Expanded to 5 Sections + Teacher Mode. 1. Navigation: Added Part D and Part E links. 2. Part D (Missing Link): Plant Sapling Scenario. - Inputs: Last digit N. - Logic: Generates the 4th point (5, 17+N). - Visual: Scatter plot of the 4 points + Line of Best Fit (calculated via JS regression) to visualize interpolation/extrapolation. 3. Part E (Outlier): Study Group Scenario. - Inputs: Last digit N. - Logic: Generates outlier (10, N). - Visual: Scatter plot showing original perfect correlation points vs. the new outlier. Toggles to show how the line shifts. 4. Teacher Mode: - Updated to calculate specific Answer Keys for D (Interpolation/Extrapolation values) and E (New r-value) based on student ID. -->
-
-<!-- Visualization & Content Choices: 1. Part D Chart: - Goal: Visualise the gap (Interpolation) and the distant prediction (Extrapolation). - Method: Scatter plot with a line extending to x=50. - Justification: Helps students "see" why Day 50 is risky compared to Day 3. 2. Part E Chart: - Goal: Show the "Leverage" effect of an outlier. - Method: Scatter plot. - Interaction: Toggle "Show Outlier" to see the r-value and line crash. -->
+<!-- Application Structure Plan: 1. Navigation: Links to Overview, Parts A-E, Reference. Teacher Mode link REMOVED from visual UI for security. 2. Intro Section: Restored detailed instructions with direct Desmos link. 3. Part A-E: Full interactive modules as designed previously. 4. Teacher Mode: Hidden "Easter Egg" access. - TRIGGER: Click the subtitle "Foundations for College Math 12" in the sidebar 5 times rapidly to reveal the Teacher Grading Mode. -->
 
 <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
 
 <!DOCTYPE html>
 
-<html lang="en"> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>MAP4C1 Assessment & Grading Tool</title> <script src="https://cdn.tailwindcss.com"></script> <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <style> @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+<html lang="en"> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>MAP4C1 Assessment Portal</title> <script src="https://cdn.tailwindcss.com"></script> <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <style> @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
     body { font-family: 'Inter', sans-serif; background-color: #f5f5f4; color: #1c1917; }
     
@@ -23,6 +21,9 @@
     /* Transition helper */
     .fade-in { animation: fadeIn 0.3s ease-in-out; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    /* Unselectable text for the secret trigger */
+    .noselect { user-select: none; cursor: default; }
 </style>
 </head> <body class="flex flex-col md:flex-row min-h-screen">
 
@@ -36,7 +37,8 @@
 <nav id="sidebar" class="hidden md:flex flex-col w-64 bg-white border-r border-stone-200 fixed h-full z-40 transition-transform transform md:translate-x-0 -translate-x-full">
     <div class="p-6 border-b border-stone-100">
         <h1 class="text-xl font-bold text-stone-800">MAP4C1 Stats</h1>
-        <p class="text-xs text-stone-500 mt-1">Foundations for College Math 12</p>
+        <!-- SECRET TRIGGER: Click this subtitle 5 times to open Teacher Mode -->
+        <p id="secret-trigger" class="text-xs text-stone-500 mt-1 noselect hover:text-stone-800 transition-colors" onclick="checkTeacherSecret()">Foundations for College Math 12</p>
     </div>
     <div class="flex-1 overflow-y-auto py-4">
         <ul class="space-y-1">
@@ -50,7 +52,7 @@
         </ul>
     </div>
     <div class="p-4 border-t border-stone-100 bg-stone-50">
-        <button onclick="navigateTo('teacher-mode')" class="text-xs text-stone-400 hover:text-sky-600 underline w-full text-center">Teacher Grading Mode</button>
+        <p class="text-[10px] text-stone-400 text-center">Assessment Portal v2.0</p>
     </div>
 </nav>
 
@@ -67,13 +69,34 @@
                 </div>
                 <span class="mt-4 md:mt-0 bg-sky-100 text-sky-800 px-3 py-1 rounded-full text-sm font-medium">Desmos Required</span>
             </div>
+            
             <div class="prose max-w-none text-stone-600">
-                <p class="mb-4">Welcome to the interactive companion for your Unit 6 assessment.</p>
+                <p class="mb-4">
+                    Welcome to the interactive companion for your Unit 6 assessment. This tool will generate your unique data sets and help you visualize key concepts.
+                </p>
+
                 <div class="bg-amber-50 border-l-4 border-amber-400 p-4 rounded-r mb-6">
-                    <h3 class="text-sm font-medium text-amber-800">Unique Data Requirement</h3>
-                    <p class="text-sm text-amber-700 mt-1">Portions of this assessment rely on your <strong>Student ID</strong>. Use this app to generate your unique data, then screenshot your work in Desmos.</p>
+                    <div class="flex">
+                        <span class="text-amber-500 text-xl mr-3">⚠</span>
+                        <div>
+                            <h3 class="text-sm font-medium text-amber-800">Unique Data Requirement</h3>
+                            <p class="text-sm text-amber-700 mt-1">
+                                Portions of this assessment rely on your <strong>Student ID</strong>. Ensure you use the values generated here, or your answers will be marked incorrect.
+                            </p>
+                        </div>
+                    </div>
                 </div>
-                <button onclick="navigateTo('part-a')" class="bg-stone-900 text-white px-6 py-3 rounded-lg hover:bg-stone-800 transition shadow-lg flex items-center gap-2">Start Assessment <span>→</span></button>
+                
+                <h3 class="text-lg font-semibold text-stone-800 mb-2">Instructions:</h3>
+                <ul class="list-disc pl-5 space-y-2 mb-6">
+                    <li>Open <a href="[https://www.desmos.com/calculator](https://www.desmos.com/calculator)" target="_blank" class="text-sky-600 hover:underline font-medium">Desmos Graphing Calculator</a> in a separate tab.</li>
+                    <li>Use the sections in the sidebar (A, B, C, D, E) to view your specific questions and generate your unique data.</li>
+                    <li>Take screenshots of your Desmos work as evidence and paste them into your Answer Sheet.</li>
+                </ul>
+                
+                <button onclick="navigateTo('part-a')" class="bg-stone-900 text-white px-6 py-3 rounded-lg hover:bg-stone-800 transition shadow-lg flex items-center gap-2">
+                    Start Assessment <span>→</span>
+                </button>
             </div>
         </div>
     </section>
@@ -273,11 +296,14 @@
         </div>
     </section>
 
-    <!-- SECTION: TEACHER GRADING MODE -->
+    <!-- SECTION: TEACHER GRADING MODE (HIDDEN) -->
     <section id="teacher-mode" class="hidden space-y-6 fade-in">
         <div class="glass-panel p-6 md:p-8 border-l-8 border-purple-600">
             <div class="border-b border-stone-200 pb-4 mb-6">
-                <h2 class="text-2xl font-bold text-purple-900">👩‍🏫 Teacher Grading Mode</h2>
+                <div class="flex justify-between items-center">
+                    <h2 class="text-2xl font-bold text-purple-900">👩‍🏫 Teacher Grading Mode</h2>
+                    <button onclick="navigateTo('intro')" class="text-xs text-stone-400 hover:text-stone-600">Exit</button>
+                </div>
                 <p class="text-stone-500 mt-1">Generate the Answer Key for any student.</p>
             </div>
             
@@ -333,14 +359,26 @@
 </main>
 
 <script>
+    // --- Secret Trigger Logic ---
+    let secretClicks = 0;
+    function checkTeacherSecret() {
+        secretClicks++;
+        if (secretClicks >= 5) {
+            navigateTo('teacher-mode');
+            secretClicks = 0;
+        }
+        // Reset clicks if inactive for 2 seconds
+        setTimeout(() => { if(secretClicks > 0) secretClicks--; }, 2000);
+    }
+
     // --- Navigation ---
     function navigateTo(sectionId) {
-        document.querySelectorAll('main > section').forEach(sec => sec.classList.remove('active', 'fade-in')); // clear animation
+        document.querySelectorAll('main > section').forEach(sec => sec.classList.remove('active', 'fade-in'));
         document.querySelectorAll('main > section').forEach(sec => sec.classList.add('hidden'));
         
         const target = document.getElementById(sectionId);
         target.classList.remove('hidden');
-        target.classList.add('fade-in'); // trigger animation
+        target.classList.add('fade-in'); 
         
         document.querySelectorAll('.nav-item').forEach(btn => {
             btn.classList.remove('active');
@@ -413,7 +451,7 @@
         });
     }
 
-    // --- Part D Logic (Missing Link) ---
+    // --- Part D Logic ---
     let chartD = null;
     function generatePartD() {
         const val = parseInt(document.getElementById('part-d-input').value);
@@ -423,14 +461,12 @@
         document.getElementById('part-d-data').classList.remove('hidden');
         document.getElementById('part-d-val').innerText = p4_y;
         
-        // Regression Logic
         const pts = [{x:1, y:5}, {x:2, y:8}, {x:4, y:14}, {x:5, y:p4_y}];
         // Calc stats for line
         let sumX=12, sumY=27+p4_y, sumXY=77+5*p4_y, sumX2=46, n=4;
         let m = (n*sumXY - sumX*sumY) / (n*sumX2 - sumX*sumX);
         let b = (sumY - m*sumX) / n;
         
-        // Visual Data (Extrapolating to 50)
         const lineData = [{x:0, y:b}, {x:50, y:m*50+b}];
         
         const ctxD = document.getElementById('chartD').getContext('2d');
@@ -447,7 +483,7 @@
         });
     }
 
-    // --- Part E Logic (Outlier) ---
+    // --- Part E Logic ---
     let chartE = null;
     function generatePartE() {
         const val = parseInt(document.getElementById('part-e-input').value);
@@ -461,7 +497,6 @@
         const allPts = [...originalPts, {x:10, y:outlierY}];
         
         // Calc r
-        // Simple r calc helper
         function calcR(data) {
             let n=data.length, sx=0, sy=0, sxy=0, sx2=0, sy2=0;
             data.forEach(p => { sx+=p.x; sy+=p.y; sxy+=p.x*p.y; sx2+=p.x*p.x; sy2+=p.y*p.y; });
@@ -504,17 +539,15 @@
         document.getElementById('key-prediction').innerText = `${predC.toFixed(2)} °C`;
 
         // Part D
-        // y = (3 + 0.2N)x + (2 - 0.35N)
-        const m = 3 + 0.2*N;
-        const b = 2 - 0.35*N;
+        const m = (4*(77+5*(17+N)) - 12*(27+(17+N))) / (4*46 - 12*12);
+        const b = ((27+(17+N)) - m*12) / 4;
+        
         document.getElementById('key-d-point').innerText = 17+N;
         document.getElementById('key-d-eqn').innerText = `y = ${m.toFixed(2)}x + ${b.toFixed(2)}`;
         document.getElementById('key-d-interp').innerText = (m*3 + b).toFixed(2);
         document.getElementById('key-d-extrap').innerText = (m*50 + b).toFixed(2);
 
         // Part E
-        // Outlier (10, N). Pts: (1,10)...(5,50), (10,N)
-        // Using logic from scratch:
         const eData = [{x:1, y:10}, {x:2, y:20}, {x:3, y:30}, {x:4, y:40}, {x:5, y:50}, {x:10, y:N}];
         let n=6, sx=0, sy=0, sxy=0, sx2=0, sy2=0;
         eData.forEach(p => { sx+=p.x; sy+=p.y; sxy+=p.x*p.y; sx2+=p.x*p.x; sy2+=p.y*p.y; });
@@ -526,4 +559,5 @@
         document.getElementById('key-e-r').innerText = rE.toFixed(4);
     }
 </script>
-</body> </html>
+</body> 
+</html>
