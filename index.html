@@ -57,7 +57,7 @@
             </ul>
         </div>
         <div class="p-4 border-t border-stone-100 bg-stone-50">
-            <p class="text-[10px] text-stone-400 text-center">Assessment Portal v5.0</p>
+            <p class="text-[10px] text-stone-400 text-center">Assessment Portal v7.0</p>
         </div>
     </nav>
 
@@ -290,7 +290,7 @@
                      <div class="bg-white p-4 rounded-xl border border-stone-200 shadow-sm">
                         <div class="flex justify-between items-center mb-2">
                              <h4 class="font-medium text-amber-900">Leverage Visualizer</h4>
-                             <span id="part-e-r" class="text-xs font-mono bg-stone-100 px-2 py-1 rounded">r = 1.00</span>
+                             <!-- Removed R value display -->
                         </div>
                         <div class="chart-container"><canvas id="chartE"></canvas></div>
                     </div>
@@ -420,7 +420,15 @@
         let chartB = new Chart(ctxB, {
             type: 'scatter',
             data: { datasets: [{ label: 'Observed', data: dataB_X.map((x, i) => ({x, y: dataB_Y[i]})), backgroundColor: '#1c1917', pointRadius: 6 }] },
-            options: { responsive: true, maintainAspectRatio: false, scales: { x: {min:0, max:4}, y: {min:0, max:25} } }
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: false, 
+                plugins: { title: { display: true, text: 'Ball Thrown into Air (Time vs Height)', font: { size: 16 } } },
+                scales: { 
+                    x: { min: 0, max: 4, title: { display: true, text: 'Time (s)' } }, 
+                    y: { min: 0, max: 25, title: { display: true, text: 'Height (m)' } } 
+                } 
+            }
         });
         function updateChartB(type) {
             const stats = document.getElementById('model-stats');
@@ -462,7 +470,15 @@
             chartC = new Chart(ctxC, {
                 type: 'scatter',
                 data: { datasets: [{ label: `Student Data`, data: result.data, backgroundColor: '#059669', showLine: false }] },
-                options: { responsive: true, maintainAspectRatio: false, scales: { y: {min: 0} } }
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false,
+                    plugins: { title: { display: true, text: 'Cooling Rate of Coffee', font: { size: 16 } } },
+                    scales: { 
+                        x: { title: { display: true, text: 'Time (min)' } },
+                        y: { min: 0, title: { display: true, text: 'Temp (°C)' } } 
+                    } 
+                }
             });
         }
 
@@ -494,7 +510,15 @@
                         { label: 'Trend', data: lineData, type:'line', borderColor: '#818cf8', borderDash: [5,5], pointRadius: 0 }
                     ]
                 },
-                options: { responsive: true, maintainAspectRatio: false, scales: { x: {max: 55} } }
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false,
+                    plugins: { title: { display: true, text: 'Plant Growth (Interpolation vs Extrapolation)', font: { size: 16 } } }, 
+                    scales: { 
+                        x: { max: 55, title: { display: true, text: 'Day' } },
+                        y: { title: { display: true, text: 'Height (cm)' } }
+                    } 
+                }
             });
         }
 
@@ -511,16 +535,7 @@
             const originalPts = [{x:1, y:10}, {x:2, y:20}, {x:3, y:30}, {x:4, y:40}, {x:5, y:50}];
             const allPts = [...originalPts, {x:10, y:outlierY}];
             
-            // Calc r
-            function calcR(data) {
-                let n=data.length, sx=0, sy=0, sxy=0, sx2=0, sy2=0;
-                data.forEach(p => { sx+=p.x; sy+=p.y; sxy+=p.x*p.y; sx2+=p.x*p.x; sy2+=p.y*p.y; });
-                let num = n*sxy - sx*sy;
-                let den = Math.sqrt((n*sx2 - sx*sx)*(n*sy2 - sy*sy));
-                return (num/den).toFixed(3);
-            }
-            const newR = calcR(allPts);
-            document.getElementById('part-e-r').innerText = `r = ${newR}`;
+            // Removed visual R calculation logic to force students to calculate it
 
             const ctxE = document.getElementById('chartE').getContext('2d');
             if (chartE) chartE.destroy();
@@ -532,7 +547,15 @@
                         { label: 'Outlier', data: [{x:10, y:outlierY}], backgroundColor: '#d97706', pointRadius: 8, pointStyle: 'triangle' }
                     ]
                 },
-                options: { responsive: true, maintainAspectRatio: false, scales: { x: {max: 12}, y: {min:0, max:60} } }
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false,
+                    plugins: { title: { display: true, text: 'Study Hours vs Test Scores (Outlier Effect)', font: { size: 16 } } },
+                    scales: { 
+                        x: { max: 12, title: { display: true, text: 'Hours Studied' } }, 
+                        y: { min: 0, max: 60, title: { display: true, text: 'Score' } } 
+                    } 
+                }
             });
         }
 
