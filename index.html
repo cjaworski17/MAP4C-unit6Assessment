@@ -57,7 +57,7 @@
             </ul>
         </div>
         <div class="p-4 border-t border-stone-100 bg-stone-50">
-            <p class="text-[10px] text-stone-400 text-center">Assessment Portal v7.0</p>
+            <p class="text-[10px] text-stone-400 text-center">Assessment Portal v8.0</p>
         </div>
     </nav>
 
@@ -186,7 +186,7 @@
         <!-- SECTION: Part C -->
         <section id="part-c" class="hidden space-y-6 fade-in">
             <div class="glass-panel p-6 md:p-8">
-                <div class="border-b border-stone-200 pb-4 mb-6"><h2 class="text-2xl font-bold text-stone-800">Part C: The Unique Case Study</h2></div>
+                <div class="border-b border-stone-200 pb-4 mb-6"><h2 class="text-2xl font-bold text-stone-800">Part C: The Unique Study of Coffee Tempurature</h2></div>
                 <div class="bg-white p-6 rounded-lg border border-stone-200 shadow-sm mb-8">
                     <label class="block text-sm font-bold text-stone-700 mb-2">Enter Your Student ID:</label>
                     <div class="flex gap-4 items-center">
@@ -256,7 +256,6 @@
                     <div class="bg-white p-4 rounded-xl border border-stone-200 shadow-sm">
                         <h4 class="text-center font-medium text-indigo-900 mb-2">Plant Growth Visualizer</h4>
                         <div class="chart-container"><canvas id="chartD"></canvas></div>
-                        <p class="text-xs text-center text-stone-400 mt-2">Dotted line shows extrapolation path.</p>
                     </div>
                 </div>
             </div>
@@ -268,11 +267,11 @@
                 <div class="border-b border-stone-200 pb-4 mb-6"><h2 class="text-2xl font-bold text-stone-800">Part E: The "Outlier" Impact</h2></div>
                 <div class="grid lg:grid-cols-2 gap-8 items-start">
                     <div class="space-y-6">
-                         <p class="text-stone-600"><strong>Scenario:</strong> You have a "Perfect Study Group" where hours studied correlates perfectly with scores (<i>r=1</i>). What happens when a unique outlier joins?</p>
+                         <p class="text-stone-600"><strong>Scenario:</strong> You have a "Perfect Study Group" where hours studied correlates perfectly with scores (<i>r = 1 </i>). What happens when a unique outlier joins?</p>
                         
                          <!-- Input E -->
                         <div class="bg-amber-50 p-6 rounded-lg border border-amber-100 shadow-sm">
-                            <label class="block text-sm font-bold text-amber-900 mb-2">Last Digit of ID (<i>N</i>):</label>
+                            <label class="block text-sm font-bold text-amber-900 mb-2">Last Digit of ID (<i>N </i>):</label>
                             <div class="flex gap-4">
                                 <input type="number" id="part-e-input" min="0" max="9" class="w-32 p-2 border border-amber-300 rounded focus:ring-amber-500" placeholder="e.g. 2">
                                 <button onclick="generatePartE()" class="bg-amber-600 text-white px-4 py-2 rounded hover:bg-amber-700 text-sm">Add Outlier</button>
@@ -303,7 +302,7 @@
             <div class="glass-panel p-6 md:p-8">
                 <h2 class="text-2xl font-bold text-stone-800 mb-6">Reference Guide</h2>
                 <div class="grid md:grid-cols-2 gap-6">
-                    <div class="bg-white p-6 rounded-lg border border-stone-200 shadow-sm"><h3 class="text-sky-700 font-bold mb-2">Correlation (<i>r</i>)</h3><p class="text-sm text-stone-600">Measures linear strength. -1 to +1.</p></div>
+                    <div class="bg-white p-6 rounded-lg border border-stone-200 shadow-sm"><h3 class="text-sky-700 font-bold mb-2">Correlation (<i>r </i>)</h3><p class="text-sm text-stone-600">Measures linear strength. -1 to +1.</p></div>
                     <div class="bg-white p-6 rounded-lg border border-stone-200 shadow-sm"><h3 class="text-emerald-700 font-bold mb-2">Determination (<i>r<sup> 2 </sup></i>)</h3><p class="text-sm text-stone-600">Percentage of fit. Best for comparing curves.</p></div>
                     <div class="bg-white p-6 rounded-lg border border-stone-200 shadow-sm"><h3 class="text-indigo-700 font-bold mb-2">Interpolation</h3><p class="text-sm text-stone-600">Predicting <strong>inside</strong> the data range. Usually reliable.</p></div>
                     <div class="bg-white p-6 rounded-lg border border-stone-200 shadow-sm"><h3 class="text-amber-700 font-bold mb-2">Extrapolation</h3><p class="text-sm text-stone-600">Predicting <strong>outside</strong> the data range. Often unreliable.</p></div>
@@ -493,12 +492,6 @@
             document.getElementById('part-d-val').innerText = p4_y;
             
             const pts = [{x:1, y:5}, {x:2, y:8}, {x:4, y:14}, {x:5, y:p4_y}];
-            // Calc stats for line
-            let sumX=12, sumY=27+p4_y, sumXY=77+5*p4_y, sumX2=46, n=4;
-            let m = (n*sumXY - sumX*sumY) / (n*sumX2 - sumX*sumX);
-            let b = (sumY - m*sumX) / n;
-            
-            const lineData = [{x:0, y:b}, {x:50, y:m*50+b}];
             
             const ctxD = document.getElementById('chartD').getContext('2d');
             if (chartD) chartD.destroy();
@@ -507,7 +500,6 @@
                 data: {
                     datasets: [
                         { label: 'Observed', data: pts, backgroundColor: '#4338ca', pointRadius: 6 },
-                        { label: 'Trend', data: lineData, type:'line', borderColor: '#818cf8', borderDash: [5,5], pointRadius: 0 }
                     ]
                 },
                 options: { 
