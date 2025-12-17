@@ -430,7 +430,7 @@
                 stats.innerHTML = `<strong>Linear:</strong> <i>r = 0.05</i> (Fail). Line ignores curve.`;
             } else {
                 chartB.data.datasets.push({ type: 'line', label: 'Quadratic', data: dataB_X.map(x => ({x, y: -4.4*Math.pow(x-2,2)+20.2})), borderColor: '#0284c7', borderWidth: 2, pointRadius: 0 });
-                stats.innerHTML = `<strong>Quadratic:</strong> <i>r^2 \\approx 0.99</i> (Pass). Matches physics.`;
+                stats.innerHTML = `<strong>Quadratic: </strong> <i>r<sup> 2</sup> = approx 0.99</i> (Pass). Matches physics.`;
             }
             chartB.update();
         }
