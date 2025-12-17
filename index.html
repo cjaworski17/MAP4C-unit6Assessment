@@ -57,7 +57,7 @@
             </ul>
         </div>
         <div class="p-4 border-t border-stone-100 bg-stone-50">
-            <p class="text-[10px] text-stone-400 text-center">Assessment Portal v3.0</p>
+            <p class="text-[10px] text-stone-400 text-center">Assessment Portal v5.0</p>
         </div>
     </nav>
 
@@ -144,7 +144,7 @@
                         <ol class="list-decimal pl-5 space-y-3 text-stone-700">
                             <li><strong>Create Table:</strong> In Desmos, make a table (10+ points) matching the criteria.</li>
                             <li><strong>Screenshot:</strong> Capture table, graph, and regression (<i>r, m, b</i>).</li>
-                            <li><strong>Explain:</strong> Discuss the visual "scatter".</li>
+                            <li><strong>Explain:</strong> Discuss the visual "scatter" relative to the line.</li>
                         </ol>
                     </div>
                 </div>
@@ -206,7 +206,7 @@
                         <div class="mt-6 space-y-4">
                             <h3 class="font-bold text-stone-800">Analysis Tasks</h3>
                             <div class="p-4 bg-stone-50 rounded border border-stone-200 text-sm space-y-2">
-                                <p><strong>a) Test Models:</strong> Find <i>r^2</i> for Linear, Quadratic, Exponential.</p>
+                                <p><strong>a) Test Models:</strong> Find <i>r<sup> 2</sup></i> for Linear, Quadratic, Exponential.</p>
                                 <p><strong>b) Select:</strong> Which fits best?</p>
                                 <p><strong>c) Predict:</strong> Temp at 200 mins?</p>
                             </div>
@@ -427,10 +427,10 @@
             chartB.data.datasets = chartB.data.datasets.filter(d => d.label === 'Observed');
             if (type === 'linear') {
                 chartB.data.datasets.push({ type: 'line', label: 'Linear', data: dataB_X.map(x => ({x, y: 10.7 + 2.4*x})), borderColor: '#ef4444', borderWidth: 2, pointRadius: 0 });
-                stats.innerHTML = `<strong>Linear:</strong> <i>r = 0.05</i> (Fail). Line ignores curve.`;
+                stats.innerHTML = `<strong>Linear:</strong> <i>r = 0.05</i>`;
             } else {
                 chartB.data.datasets.push({ type: 'line', label: 'Quadratic', data: dataB_X.map(x => ({x, y: -4.4*Math.pow(x-2,2)+20.2})), borderColor: '#0284c7', borderWidth: 2, pointRadius: 0 });
-                stats.innerHTML = `<strong>Quadratic: </strong> <i>r<sup> 2</sup> = approx 0.99</i> (Pass). Matches physics.`;
+                stats.innerHTML = `<strong>Quadratic: </strong> <i>r<sup> 2</sup> = approx 0.99</i>.`;
             }
             chartB.update();
         }
@@ -461,7 +461,7 @@
             if (chartC) chartC.destroy();
             chartC = new Chart(ctxC, {
                 type: 'scatter',
-                data: { datasets: [{ label: `Student Data`, data: result.data, backgroundColor: '#059669', showLine: true }] },
+                data: { datasets: [{ label: `Student Data`, data: result.data, backgroundColor: '#059669', showLine: false }] },
                 options: { responsive: true, maintainAspectRatio: false, scales: { y: {min: 0} } }
             });
         }
